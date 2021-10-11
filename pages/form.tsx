@@ -3,51 +3,75 @@ import { useRouter } from 'next/router'
 import Link from 'next/link'
 import { useState } from 'react'
 
-import {ButtonForm, Container,  Formulario, TextForm} from '../styles/Form'
+import { ButtonForm, Container, Formulario, TextForm } from "../styles/Form";
 
-export default function Form() {
-  
-  const [titulo, setTitulo] = useState('')
-  const [descricao, setDescricao] = useState('')
-  const [autor, setAutor] = useState('')
-  const [texto, setTexto] = useState('')
+const valorInicial = {
+  titulo: "",
+  descricao: "",
+  autor: "",
+  texto: "",
+};
 
-  const router = useRouter()
+const Form: React.FC = () => {
+  const [valor, setValor] = useState(valorInicial);
 
-  const addPost = {
+  function handleChange(event) {
+    const { name, value } = event.target;
+
+    setValor({ ...valor, [name]: value });
+  }
+
+  const router = useRouter();
+
+  function handleSubmit(event) {
+    event.preventDefault();
+    axios
+      .post("https://crud-api2021.herokuapp.com/posts", valor)
+      .then((resp) => {
+        router.push("/");
+      })
+      .catch(() => {
+        console.log("deu errado");
+      });
+  }
+
+  /*const [titulo, setTitulo] = useState("");
+  const [descricao, setDescricao] = useState("");
+  const [autor, setAutor] = useState("");
+  const [texto, setTexto] = useState("");*/
+
+  /*const addPost = {
     titulo,
     descricao,
     autor,
-    texto
-  }
-  function onSubmit(e) {
-    e.preventDefault()
+    texto,
+  };
+  console.log({ addPost });
+  /*function onSubmit(e) {
+    e.preventDefault();
 
     axios
-      .post('https://crud-api2021.herokuapp.com/posts', addPost)
-      .then(resp => {
-        router.push('/')
+      .post("https://crud-api2021.herokuapp.com/posts", addPost)
+      .then((resp) => {
+        router.push("/");
       })
       .catch(() => {
-        console.log('deu errado')
-      })
-  }
+        console.log("deu errado");
+      });
+  }*/
 
   return (
     <Container>
       <Formulario>
-           <Link href="/" >
-          Pagina principal
-        </Link>
-        <div >
+        <Link href="/">Pagina principal</Link>
+        <div>
           <label>Titulo</label>
           <input
             required
             id="titulo"
             name="titulo"
-            value={titulo}
             type="text"
-            onChange={e => setTitulo(e.target.value)}
+            onChange={handleChange}
           />
         </div>
         <div>
@@ -56,9 +80,8 @@ export default function Form() {
             required
             id="descricao"
             name="descricao"
-            value={descricao}
             type="text"
-            onChange={e => setDescricao(e.target.value)}
+            onChange={handleChange}
           />
         </div>
         <div>
@@ -67,23 +90,17 @@ export default function Form() {
             required
             id="autor"
             name="autor"
-            value={autor}
             type="text"
-            onChange={e => setAutor(e.target.value)}
+            onChange={handleChange}
           />
         </div>
         <label>Publicação</label>
-         <TextForm
-            required            
-            id="texto"
-            name="texto"
-            value={texto}         
-            onChange={e => setTexto(e.target.value)}
-        />    
+        <TextForm required id="texto" name="texto" onChange={handleChange} />
       </Formulario>
-        <ButtonForm type="submit" onClick={onSubmit}>
-          Publique
-        </ButtonForm>
+      <ButtonForm onClick={handleSubmit}>Publique</ButtonForm>
     </Container>
-  )
-}
+  );
+};
+
+export default Form;
+
